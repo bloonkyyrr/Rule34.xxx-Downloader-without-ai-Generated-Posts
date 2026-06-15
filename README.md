@@ -1,4 +1,4 @@
-# Rule34.xxx Downloader v.1.0.5
+# Rule34.xxx Downloader v.1.0.6
 fork from DaxEleven
 An application for downloading content from the site Rule34.xxx. It allows you to download both images and videos. Downloading is possible either via the official API or through HTML parsing (if the API is unavailable for any reason).
 
