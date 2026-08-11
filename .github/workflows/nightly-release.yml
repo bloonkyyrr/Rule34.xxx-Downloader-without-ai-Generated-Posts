@@ -3,7 +3,7 @@ name: Nightly Release
 on:
   schedule:
     - cron: '0 0 * * *' # Runs daily at 00:00 UTC
-  workflow_dispatch: # Allows manual triggers from the Actions tab
+  workflow_dispatch: # Allows manual triggers
 
 jobs:
   build-and-release:
@@ -39,7 +39,14 @@ jobs:
       - name: Zip Build Output
         shell: pwsh
         run: |
-          Compress-Archive -Path "R34Downloader/bin/Release/*" -DestinationPath "R34Downloader-Nightly.zip"
+          $buildDir = Get-ChildItem -Path . -Recurse -Directory | Where-Object { $_.FullName -like "*bin*Release*" -and $_.FullName -notlike "*obj*" } | Select-Object -ExpandProperty FullName -First 1
+          if ($buildDir) {
+            Write-Host "Zipping files from: $buildDir"
+            Compress-Archive -Path "$buildDir\*" -DestinationPath "R34Downloader-Nightly.zip"
+          } else {
+            Write-Error "Release build directory was not found!"
+            exit 1
+          }
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
