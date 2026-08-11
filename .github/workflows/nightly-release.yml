@@ -1,0 +1,51 @@
+name: Nightly Release
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs daily at 00:00 UTC
+  workflow_dispatch: # Allows manual triggers from the Actions tab
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build Project
+        run: msbuild /p:Configuration=Release
+
+      - name: Generate Tag Name
+        id: tag
+        shell: pwsh
+        run: |
+          $date = Get-Date -Format "yyyy.MM.dd"
+          $tagName = "v1.0.0-nightly.$date"
+          echo "tag_name=$tagName" >> $env:GITHUB_OUTPUT
+
+      - name: Zip Build Output
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "R34Downloader/bin/Release/*" -DestinationPath "R34Downloader-Nightly.zip"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag_name }}
+          name: "Nightly Build ${{ steps.tag.outputs.tag_name }}"
+          body: "Automated nightly build generated from commit ${{ github.sha }}."
+          prerelease: true
+          files: R34Downloader-Nightly.zip
