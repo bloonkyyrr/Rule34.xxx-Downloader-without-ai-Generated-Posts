@@ -1,4 +1,4 @@
-name: Nightly Release
+name: Automatic Release
 
 on:
   schedule:
@@ -52,7 +52,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.tag.outputs.tag_name }}
-          name: "Nightly Build ${{ steps.tag.outputs.tag_name }}"
-          body: "Automated nightly build generated from commit ${{ github.sha }}."
+          name: "Automatic Build ${{ steps.tag.outputs.tag_name }}"
+          body: "Automated build generated from commit ${{ github.sha }}."
           prerelease: false
           files: R34Downloader-Nightly.zip
