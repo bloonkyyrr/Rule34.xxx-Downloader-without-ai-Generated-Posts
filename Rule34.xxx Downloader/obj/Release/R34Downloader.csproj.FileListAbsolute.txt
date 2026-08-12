@@ -1,0 +1,14 @@
+C:\Users\Bloonkyyy\Documents\R34 downloader\2\Rule34.xxx-Downloader-working-updated-without-ai\Rule34.xxx Downloader\obj\Release\R34Downloader.csproj.AssemblyReference.cache
+C:\Users\Bloonkyyy\Documents\R34 downloader\2\Rule34.xxx-Downloader-working-updated-without-ai\Rule34.xxx Downloader\obj\Release\R34Downloader.Forms.DownloadingForm.resources
+C:\Users\Bloonkyyy\Documents\R34 downloader\2\Rule34.xxx-Downloader-working-updated-without-ai\Rule34.xxx Downloader\obj\Release\R34Downloader.Forms.MainForm.resources
+C:\Users\Bloonkyyy\Documents\R34 downloader\2\Rule34.xxx-Downloader-working-updated-without-ai\Rule34.xxx Downloader\obj\Release\R34Downloader.Properties.Resources.resources
+C:\Users\Bloonkyyy\Documents\R34 downloader\2\Rule34.xxx-Downloader-working-updated-without-ai\Rule34.xxx Downloader\obj\Release\R34Downloader.Forms.SettingsForm.resources
+C:\Users\Bloonkyyy\Documents\R34 downloader\2\Rule34.xxx-Downloader-working-updated-without-ai\Rule34.xxx Downloader\obj\Release\R34Downloader.csproj.GenerateResource.cache
+C:\Users\Bloonkyyy\Documents\R34 downloader\2\Rule34.xxx-Downloader-working-updated-without-ai\Rule34.xxx Downloader\obj\Release\R34Downloader.csproj.CoreCompileInputs.cache
+C:\Users\Bloonkyyy\Documents\R34 downloader\2\Rule34.xxx-Downloader-working-updated-without-ai\Rule34.xxx Downloader\bin\Release\R34Downloader.exe.config
+C:\Users\Bloonkyyy\Documents\R34 downloader\2\Rule34.xxx-Downloader-working-updated-without-ai\Rule34.xxx Downloader\bin\Release\R34Downloader.exe
+C:\Users\Bloonkyyy\Documents\R34 downloader\2\Rule34.xxx-Downloader-working-updated-without-ai\Rule34.xxx Downloader\bin\Release\R34Downloader.pdb
+C:\Users\Bloonkyyy\Documents\R34 downloader\2\Rule34.xxx-Downloader-working-updated-without-ai\Rule34.xxx Downloader\bin\Release\HtmlAgilityPack.dll
+C:\Users\Bloonkyyy\Documents\R34 downloader\2\Rule34.xxx-Downloader-working-updated-without-ai\Rule34.xxx Downloader\obj\Release\R34Downl.3D6BFE12.Up2Date
+C:\Users\Bloonkyyy\Documents\R34 downloader\2\Rule34.xxx-Downloader-working-updated-without-ai\Rule34.xxx Downloader\obj\Release\R34Downloader.exe
+C:\Users\Bloonkyyy\Documents\R34 downloader\2\Rule34.xxx-Downloader-working-updated-without-ai\Rule34.xxx Downloader\obj\Release\R34Downloader.pdb

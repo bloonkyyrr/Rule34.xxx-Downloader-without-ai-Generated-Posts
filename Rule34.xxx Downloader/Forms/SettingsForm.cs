@@ -36,6 +36,9 @@ namespace R34Downloader.Forms
 
             textBox1.Text = SettingsModel.UserId;
             textBox2.Text = SettingsModel.ApiKey;
+            checkBoxFileSizeLimit.Checked = SettingsModel.EnableFileSizeLimit;
+            numericUpDownFileSizeMB.Value = (decimal)SettingsModel.MaxFileSizeMB;
+            numericUpDownFileSizeMB.Enabled = SettingsModel.EnableFileSizeLimit;
         }
 
         private void radioButton_MouseClick(object sender, MouseEventArgs e)
@@ -60,6 +63,23 @@ namespace R34Downloader.Forms
             Properties.Settings.Default.ApiKey = SettingsModel.ApiKey;
             Properties.Settings.Default.Save();
             Close();
+        }
+
+        private void checkBoxFileSizeLimit_CheckedChanged(object sender, EventArgs e)
+        {
+            SettingsModel.EnableFileSizeLimit = checkBoxFileSizeLimit.Checked;
+            numericUpDownFileSizeMB.Enabled = SettingsModel.EnableFileSizeLimit;
+        }
+
+        private void numericUpDownFileSizeMB_ValueChanged(object sender, EventArgs e)
+        {
+            SettingsModel.MaxFileSizeMB = (double)numericUpDownFileSizeMB.Value;
+        }
+
+        private void buttonLogs_Click(object sender, EventArgs e)
+        {
+            LogsForm logsForm = new LogsForm();
+            logsForm.Show();
         }
 
         #endregion

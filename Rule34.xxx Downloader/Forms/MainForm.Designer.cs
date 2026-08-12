@@ -1,4 +1,4 @@
-﻿namespace R34Downloader.Forms
+namespace R34Downloader.Forms
 {
     partial class MainForm
     {
@@ -33,6 +33,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.button2 = new System.Windows.Forms.Button();
+            this.buttonPauseResume = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
@@ -85,6 +86,19 @@
             this.button2.Text = "Download";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // buttonPauseResume
+            // 
+            this.buttonPauseResume.Enabled = false;
+            this.buttonPauseResume.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.buttonPauseResume.Location = new System.Drawing.Point(622, 435);
+            this.buttonPauseResume.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.buttonPauseResume.Name = "buttonPauseResume";
+            this.buttonPauseResume.Size = new System.Drawing.Size(124, 52);
+            this.buttonPauseResume.TabIndex = 103;
+            this.buttonPauseResume.Text = "Pause";
+            this.buttonPauseResume.UseVisualStyleBackColor = true;
+            this.buttonPauseResume.Click += new System.EventHandler(this.buttonPauseResume_Click);
             // 
             // statusStrip1
             // 
@@ -206,6 +220,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(170)))), ((int)(((byte)(229)))), ((int)(((byte)(164)))));
             this.ClientSize = new System.Drawing.Size(766, 662);
+            this.Controls.Add(this.buttonPauseResume);
             this.Controls.Add(this.linkLabel2);
             this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.button4);
@@ -240,6 +255,7 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button buttonPauseResume;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.LinkLabel linkLabel1;
         private System.Windows.Forms.Button button3;
@@ -251,3 +267,5 @@
         private System.Windows.Forms.LinkLabel linkLabel2;
     }
 }
+
+

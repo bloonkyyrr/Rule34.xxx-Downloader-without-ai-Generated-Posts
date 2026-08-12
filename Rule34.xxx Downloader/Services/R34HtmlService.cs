@@ -14,7 +14,6 @@ namespace R34Downloader.Services
     public static class R34HtmlService
     {
         #region Fields
-
         private const string ContentUrl = "https://rule34.xxx/index.php?page=post&s=list&tags=";
 
         private const byte PageSize = 42;
@@ -102,6 +101,8 @@ namespace R34Downloader.Services
 
             for (var pid = 0; pid < maxPages; pid += PageSize)
             {
+                DownloadControlService.WaitIfPaused();
+
                 var document = LoadHtmlDocument($"{ContentUrl}{tags}&pid={pid}");
                 var nodes = document.DocumentNode.SelectNodes("//div[@class='content']//span[@class='thumb']/a");
 
@@ -131,6 +132,17 @@ namespace R34Downloader.Services
 
             for (var i = 0; i < maxPosts; i++)
             {
+                DownloadControlService.WaitIfPaused();
+
+                var postId = ExtractPostId(posts[i]);
+                if (IsPostAlreadyDownloaded(path, postId))
+                {
+                    var skippedStatus = pid + i + 1;
+                    progress.Report(skippedStatus);
+                    progress2.Report(skippedStatus);
+                    continue;
+                }
+
                 var document = LoadHtmlDocument($"https://rule34.xxx/{posts[i]}");
 
                 var videoNode = document.DocumentNode.SelectSingleNode("//video[@id='gelcomVideoPlayer']/source");
@@ -143,12 +155,13 @@ namespace R34Downloader.Services
                     {
                         var filename = Path.GetFileName(videoUrl);
                         var questionMarkIndex = filename.IndexOf('?');
+                        var id = questionMarkIndex > 0 ? filename.Substring(0, questionMarkIndex) : filename;
                         if (questionMarkIndex > 0)
                         {
                             filename = Path.GetFileName(filename.Substring(0, questionMarkIndex));
                         }
 
-                        DownloadService.Download(videoUrl, Path.Combine(path, "Video", filename));
+                        DownloadService.Download(videoUrl, Path.Combine(path, "Video", filename), id, "Video");
                     }
                 }
                 else
@@ -162,11 +175,11 @@ namespace R34Downloader.Services
 
                         if (filename.Contains(".gif") && SettingsModel.Gif)
                         {
-                            DownloadService.Download(imageUrl, Path.Combine(path, "Gif", filename));
+                            DownloadService.Download(imageUrl, Path.Combine(path, "Gif", filename), id, "Gif");
                         }
                         else if (!filename.Contains(".gif") && SettingsModel.Images)
                         {
-                            DownloadService.Download(imageUrl, Path.Combine(path, "Images", filename));
+                            DownloadService.Download(imageUrl, Path.Combine(path, "Images", filename), id, "Image");
                         }
                     }
                 }
@@ -175,8 +188,64 @@ namespace R34Downloader.Services
                 progress.Report(reportStatus);
                 progress2.Report(reportStatus);
 
-                Thread.Sleep(100);
+                PauseAwareDelay(100);
             }
+        }
+
+        private static void PauseAwareDelay(int milliseconds)
+        {
+            var elapsed = 0;
+            while (elapsed < milliseconds)
+            {
+                DownloadControlService.WaitIfPaused();
+                var step = Math.Min(50, milliseconds - elapsed);
+                Thread.Sleep(step);
+                elapsed += step;
+            }
+        }
+
+        private static string ExtractPostId(string postHref)
+        {
+            if (string.IsNullOrEmpty(postHref))
+            {
+                return null;
+            }
+
+            const string idMarker = "id=";
+            var idIndex = postHref.IndexOf(idMarker, StringComparison.OrdinalIgnoreCase);
+            if (idIndex < 0)
+            {
+                return null;
+            }
+
+            var idStart = idIndex + idMarker.Length;
+            var idEnd = postHref.IndexOf('&', idStart);
+            return idEnd >= 0 ? postHref.Substring(idStart, idEnd - idStart) : postHref.Substring(idStart);
+        }
+
+        private static bool IsPostAlreadyDownloaded(string savePath, string postId)
+        {
+            if (string.IsNullOrEmpty(postId))
+            {
+                return false;
+            }
+
+            var subFolders = new[] { "Images", "Gif", "Video" };
+            foreach (var subFolder in subFolders)
+            {
+                var folder = Path.Combine(savePath, subFolder);
+                if (!Directory.Exists(folder))
+                {
+                    continue;
+                }
+
+                if (Directory.EnumerateFiles(folder, postId + ".*").Any())
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static HtmlDocument LoadHtmlDocument(string url)
@@ -235,3 +304,4 @@ namespace R34Downloader.Services
         #endregion
     }
 }
+    

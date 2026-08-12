@@ -93,6 +93,8 @@ namespace R34Downloader.Services
 
             for (var pid = 0; pid <= maxPid; pid++)
             {
+                DownloadControlService.WaitIfPaused();
+
                 var doc = new XmlDocument();
                 
                 for (int attempt = 1; attempt <= 3; attempt++)
@@ -118,24 +120,27 @@ namespace R34Downloader.Services
                 var postCount = quantity - pid * PageSize < PageSize ? quantity - pid * PageSize : PageSize;
                 for (var i = 0; i < postCount; i++)
                 {
+                    DownloadControlService.WaitIfPaused();
+
                     var url = doc.DocumentElement?.ChildNodes[i].Attributes?.GetNamedItem("file_url")?.Value;
                     var fileExtension = Path.GetExtension(url);
-                    var filename = doc.DocumentElement?.ChildNodes[i].Attributes?.GetNamedItem("id")?.Value + fileExtension;
+                    var id = doc.DocumentElement?.ChildNodes[i].Attributes?.GetNamedItem("id")?.Value;
+                    var filename = id + fileExtension;
 
                     if (url != null)
                     {
                         if ((fileExtension == ".mp4" || fileExtension == ".webm") && SettingsModel.Video)
                         {
                             var sampleUrl = doc.DocumentElement?.ChildNodes[i].Attributes?.GetNamedItem("sample_url")?.Value ?? url;
-                            DownloadService.Download(sampleUrl, Path.Combine(path, "Video", filename));
+                            DownloadService.Download(sampleUrl, Path.Combine(path, "Video", filename), id, "Video");
                         }
                         else if (fileExtension == ".gif" && SettingsModel.Gif)
                         {
-                            DownloadService.Download(url, Path.Combine(path, "Gif", filename));
+                            DownloadService.Download(url, Path.Combine(path, "Gif", filename), id, "Gif");
                         }
                         else if (fileExtension != ".mp4" && fileExtension != ".webm" && fileExtension != ".gif" && SettingsModel.Images)
                         {
-                            DownloadService.Download(url, Path.Combine(path, "Images", filename));
+                            DownloadService.Download(url, Path.Combine(path, "Images", filename), id, "Image");
                         }
                     }
 

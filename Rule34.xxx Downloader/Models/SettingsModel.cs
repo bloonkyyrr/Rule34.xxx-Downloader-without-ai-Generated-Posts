@@ -39,5 +39,15 @@ namespace R34Downloader.Models
         /// API Key.
         /// </summary>
         public static string ApiKey { get; set; }
+
+        /// <summary>
+        /// Enable file size limit filter.
+        /// </summary>
+        public static bool EnableFileSizeLimit { get; set; }
+
+        /// <summary>
+        /// Maximum file size in MB (0 = no limit).
+        /// </summary>
+        public static double MaxFileSizeMB { get; set; }
     }
 }

@@ -36,6 +36,16 @@ namespace R34Downloader.Forms
             toolStripStatusLabel1.Text = "Welcome!";
             toolStripStatusLabel2.Text = "0 / 0";
 
+            // Hook up download progress event to show percentage
+            DownloadService.OnDownloadProgress = (downloadedMB, totalMB) =>
+            {
+                if (totalMB > 0)
+                {
+                    double percentage = (downloadedMB / totalMB) * 100;
+                    toolStripStatusLabel1.Text = $"{percentage:F1}%";
+                }
+            };
+
             if (!string.IsNullOrEmpty(Properties.Settings.Default.Path))
             {
                 folderBrowserDialog1.SelectedPath = Properties.Settings.Default.Path;
@@ -134,18 +144,10 @@ namespace R34Downloader.Forms
 
                             if (SettingsModel.Limit > 0)
                             {
-                                toolStripStatusLabel1.Text = "Downloading content...";
-                                toolStripProgressBar1.Maximum = SettingsModel.Limit;
-
-                                var progress = new Progress<int>(s => toolStripProgressBar1.Value = s);
-                                var progress2 = new Progress<int>(s => toolStripStatusLabel2.Text = s + " / " + SettingsModel.Limit);
-                                await Task.Factory.StartNew(() => R34ApiService.DownloadContent(folderBrowserDialog1.SelectedPath, request, SettingsModel.Limit, progress, progress2), TaskCreationOptions.LongRunning);
-
-                                toolStripStatusLabel1.Text = "Download completed";
-                                if (MessageBox.Show("Download completed! Open the folder?", "Download completed", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
-                                {
-                                    Process.Start(folderBrowserDialog1.SelectedPath);
-                                }
+                                await RunDownloadAsync(
+                                    (path, tags, limit, progress, progress2) => R34ApiService.DownloadContent(path, tags, limit, progress, progress2),
+                                    request,
+                                    folderBrowserDialog1.SelectedPath);
                             }
                         }
                     }
@@ -169,18 +171,10 @@ namespace R34Downloader.Forms
 
                             if (SettingsModel.Limit > 0)
                             {
-                                toolStripStatusLabel1.Text = "Downloading content...";
-                                toolStripProgressBar1.Maximum = SettingsModel.Limit;
-
-                                var progress = new Progress<int>(s => toolStripProgressBar1.Value = s);
-                                var progress2 = new Progress<int>(s => toolStripStatusLabel2.Text = s + " / " + SettingsModel.Limit);
-                                await Task.Factory.StartNew(() => R34HtmlService.DownloadContent(folderBrowserDialog1.SelectedPath, request, SettingsModel.Limit, progress, progress2), TaskCreationOptions.LongRunning);
-
-                                toolStripStatusLabel1.Text = "Download completed";
-                                if (MessageBox.Show("Download completed. Open the folder?", "Download completed", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
-                                {
-                                    Process.Start(folderBrowserDialog1.SelectedPath);
-                                }
+                                await RunDownloadAsync(
+                                    (path, tags, limit, progress, progress2) => R34HtmlService.DownloadContent(path, tags, limit, progress, progress2),
+                                    request,
+                                    folderBrowserDialog1.SelectedPath);
                             }
                         }
                     }
@@ -194,6 +188,22 @@ namespace R34Downloader.Forms
             {
                 toolStripStatusLabel1.Text = "Download error";
                 MessageBox.Show(exp.Message, "Download error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void buttonPauseResume_Click(object sender, EventArgs e)
+        {
+            if (DownloadControlService.IsPaused)
+            {
+                DownloadControlService.Resume();
+                buttonPauseResume.Text = "Pause";
+                toolStripStatusLabel1.Text = "Downloading content...";
+            }
+            else
+            {
+                DownloadControlService.Pause();
+                buttonPauseResume.Text = "Resume";
+                toolStripStatusLabel1.Text = "Download paused";
             }
         }
 
@@ -227,6 +237,47 @@ namespace R34Downloader.Forms
         #endregion
 
         #region Helpers
+
+        private async Task RunDownloadAsync(
+            Action<string, string, ushort, IProgress<int>, IProgress<int>> downloadAction,
+            string request,
+            string selectedPath)
+        {
+            DownloadControlService.BeginDownload();
+            SetDownloadControls(isDownloading: true);
+
+            toolStripStatusLabel1.Text = "Downloading content...";
+            toolStripProgressBar1.Maximum = SettingsModel.Limit;
+
+            var progress = new Progress<int>(s => toolStripProgressBar1.Value = s);
+            var progress2 = new Progress<int>(s => toolStripStatusLabel2.Text = s + " / " + SettingsModel.Limit);
+
+            try
+            {
+                await Task.Factory.StartNew(
+                    () => downloadAction(selectedPath, request, SettingsModel.Limit, progress, progress2),
+                    TaskCreationOptions.LongRunning);
+
+                toolStripStatusLabel1.Text = "Download completed";
+                if (MessageBox.Show("Download completed! Open the folder?", "Download completed", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+                {
+                    Process.Start(selectedPath);
+                }
+            }
+            finally
+            {
+                DownloadControlService.Resume();
+                SetDownloadControls(isDownloading: false);
+            }
+        }
+
+        private void SetDownloadControls(bool isDownloading)
+        {
+            button1.Enabled = !isDownloading;
+            button2.Enabled = !isDownloading;
+            buttonPauseResume.Enabled = isDownloading;
+            buttonPauseResume.Text = "Pause";
+        }
 
         private static bool CheckForInternetConnection(string address)
         {
