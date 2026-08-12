@@ -145,8 +145,20 @@ namespace R34Downloader.Services
 
                 var document = LoadHtmlDocument($"https://rule34.xxx/{posts[i]}");
 
+                // Check if post contains blacklisted tags (like ai_generated) and skip if it does
+                var postTags = ExtractPostTags(document);
+                if (ContainsBlacklistedTags(postTags))
+                {
+                    var skippedStatus = pid + i + 1;
+                    progress.Report(skippedStatus);
+                    progress2.Report(skippedStatus);
+                    PauseAwareDelay(100);
+                    continue;
+                }
+
                 var videoNode = document.DocumentNode.SelectSingleNode("//video[@id='gelcomVideoPlayer']/source");
                 var imageNode = document.DocumentNode.SelectSingleNode("//meta[@property='og:image']");
+
 
                 if (videoNode != null && SettingsModel.Video)
                 {
@@ -202,6 +214,90 @@ namespace R34Downloader.Services
                 Thread.Sleep(step);
                 elapsed += step;
             }
+        }
+
+        /// <summary>
+        /// Extracts all tags from a post's HTML page.
+        /// </summary>
+        /// <param name="document">The HTML document of the post.</param>
+        /// <returns>Array of tag strings, or empty array if none found.</returns>
+        private static string[] ExtractPostTags(HtmlDocument document)
+        {
+            if (document == null || document.DocumentNode == null)
+            {
+                return new string[0];
+            }
+
+            try
+            {
+                // Tags on rule34.xxx are typically in link elements with specific class/href pattern
+                // Looking for tags that link to search pages
+                var tagNodes = document.DocumentNode.SelectNodes("//a[contains(@href, 'tags=')]");
+
+                if (tagNodes == null || tagNodes.Count == 0)
+                {
+                    return new string[0];
+                }
+
+                var tags = new System.Collections.Generic.List<string>();
+                foreach (var node in tagNodes)
+                {
+                    var href = node.GetAttributeValue("href", "");
+                    if (href.Contains("tags="))
+                    {
+                        var tagName = node.InnerText?.Trim();
+                        if (!string.IsNullOrEmpty(tagName))
+                        {
+                            // Replace underscores with spaces for consistency, then back to check against ai_generated
+                            tags.Add(tagName);
+                        }
+                    }
+                }
+
+                return tags.ToArray();
+            }
+            catch
+            {
+                // If tag extraction fails, return empty array to allow download
+                return new string[0];
+            }
+        }
+
+        /// <summary>
+        /// Checks if a post contains blacklisted tags that should be skipped.
+        /// </summary>
+        /// <param name="tags">Array of tag strings from the post.</param>
+        /// <returns>True if the post should be skipped, false otherwise.</returns>
+        private static bool ContainsBlacklistedTags(string[] tags)
+        {
+            if (tags == null || tags.Length == 0)
+            {
+                return false;
+            }
+
+            // Blacklisted tags to skip
+            var blacklistedTags = new[] { "ai_generated", "ai generated" };
+
+            foreach (var tag in tags)
+            {
+                if (string.IsNullOrEmpty(tag))
+                {
+                    continue;
+                }
+
+                var normalizedTag = tag.ToLowerInvariant().Trim();
+
+                foreach (var blacklistedTag in blacklistedTags)
+                {
+                    if (normalizedTag.Equals(blacklistedTag, StringComparison.OrdinalIgnoreCase) || 
+                        normalizedTag.Replace("_", " ").Equals(blacklistedTag, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private static string ExtractPostId(string postHref)
