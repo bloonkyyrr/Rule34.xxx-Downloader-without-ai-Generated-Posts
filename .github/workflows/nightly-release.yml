@@ -54,5 +54,5 @@ jobs:
           tag_name: ${{ steps.tag.outputs.tag_name }}
           name: "Nightly Build ${{ steps.tag.outputs.tag_name }}"
           body: "Automated nightly build generated from commit ${{ github.sha }}."
-          prerelease: true
+          prerelease: false
           files: R34Downloader-Nightly.zip
