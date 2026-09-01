@@ -145,9 +145,8 @@ namespace R34Downloader.Services
 
                 var document = LoadHtmlDocument($"https://rule34.xxx/{posts[i]}");
 
-                // Check if post contains blacklisted tags (like ai_generated) and skip if it does
                 var postTags = ExtractPostTags(document);
-                if (ContainsBlacklistedTags(postTags))
+                if (TagBlacklistService.ContainsBlacklistedTags(postTags))
                 {
                     var skippedStatus = pid + i + 1;
                     progress.Report(skippedStatus);
@@ -261,43 +260,6 @@ namespace R34Downloader.Services
                 // If tag extraction fails, return empty array to allow download
                 return new string[0];
             }
-        }
-
-        /// <summary>
-        /// Checks if a post contains blacklisted tags that should be skipped.
-        /// </summary>
-        /// <param name="tags">Array of tag strings from the post.</param>
-        /// <returns>True if the post should be skipped, false otherwise.</returns>
-        private static bool ContainsBlacklistedTags(string[] tags)
-        {
-            if (tags == null || tags.Length == 0)
-            {
-                return false;
-            }
-
-            // Blacklisted tags to skip
-            var blacklistedTags = new[] { "ai_generated", "ai generated" };
-
-            foreach (var tag in tags)
-            {
-                if (string.IsNullOrEmpty(tag))
-                {
-                    continue;
-                }
-
-                var normalizedTag = tag.ToLowerInvariant().Trim();
-
-                foreach (var blacklistedTag in blacklistedTags)
-                {
-                    if (normalizedTag.Equals(blacklistedTag, StringComparison.OrdinalIgnoreCase) || 
-                        normalizedTag.Replace("_", " ").Equals(blacklistedTag, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
         }
 
         private static string ExtractPostId(string postHref)

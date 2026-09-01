@@ -43,9 +43,13 @@ namespace R34Downloader.Forms
             this.numericUpDownFileSizeMB = new System.Windows.Forms.NumericUpDown();
             this.checkBoxFileSizeLimit = new System.Windows.Forms.CheckBox();
             this.labelFileSizeMB = new System.Windows.Forms.Label();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.labelBlacklistedTags = new System.Windows.Forms.Label();
+            this.textBoxBlacklistedTags = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownFileSizeMB)).BeginInit();
             this.SuspendLayout();
             // 
@@ -87,7 +91,7 @@ namespace R34Downloader.Forms
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(168, 271);
+            this.button1.Location = new System.Drawing.Point(168, 367);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 13;
@@ -97,7 +101,7 @@ namespace R34Downloader.Forms
             // 
             // buttonLogs
             // 
-            this.buttonLogs.Location = new System.Drawing.Point(12, 271);
+            this.buttonLogs.Location = new System.Drawing.Point(12, 367);
             this.buttonLogs.Name = "buttonLogs";
             this.buttonLogs.Size = new System.Drawing.Size(75, 23);
             this.buttonLogs.TabIndex = 14;
@@ -111,7 +115,7 @@ namespace R34Downloader.Forms
             this.groupBox3.Controls.Add(this.labelFileSizeMB);
             this.groupBox3.Controls.Add(this.checkBoxFileSizeLimit);
             this.groupBox3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.groupBox3.Location = new System.Drawing.Point(12, 212);
+            this.groupBox3.Location = new System.Drawing.Point(12, 308);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(231, 53);
             this.groupBox3.TabIndex = 15;
@@ -149,6 +153,36 @@ namespace R34Downloader.Forms
             this.numericUpDownFileSizeMB.TabIndex = 2;
             this.numericUpDownFileSizeMB.Value = new decimal(new int[] { 50, 0, 0, 0 });
             this.numericUpDownFileSizeMB.ValueChanged += new System.EventHandler(this.numericUpDownFileSizeMB_ValueChanged);
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.labelBlacklistedTags);
+            this.groupBox4.Controls.Add(this.textBoxBlacklistedTags);
+            this.groupBox4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.groupBox4.Location = new System.Drawing.Point(12, 212);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(231, 90);
+            this.groupBox4.TabIndex = 16;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = " Tag blacklist ";
+            // 
+            // labelBlacklistedTags
+            // 
+            this.labelBlacklistedTags.Location = new System.Drawing.Point(8, 18);
+            this.labelBlacklistedTags.Name = "labelBlacklistedTags";
+            this.labelBlacklistedTags.Size = new System.Drawing.Size(217, 16);
+            this.labelBlacklistedTags.TabIndex = 0;
+            this.labelBlacklistedTags.Text = "Skip posts with these tags:";
+            // 
+            // textBoxBlacklistedTags
+            // 
+            this.textBoxBlacklistedTags.Location = new System.Drawing.Point(8, 37);
+            this.textBoxBlacklistedTags.Multiline = true;
+            this.textBoxBlacklistedTags.Name = "textBoxBlacklistedTags";
+            this.textBoxBlacklistedTags.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBoxBlacklistedTags.Size = new System.Drawing.Size(217, 43);
+            this.textBoxBlacklistedTags.TabIndex = 1;
+            this.textBoxBlacklistedTags.TextChanged += new System.EventHandler(this.textBoxBlacklistedTags_TextChanged);
             // 
             // groupBox2
             // 
@@ -204,7 +238,8 @@ namespace R34Downloader.Forms
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(170)))), ((int)(((byte)(229)))), ((int)(((byte)(164)))));
-            this.ClientSize = new System.Drawing.Size(255, 305);
+            this.ClientSize = new System.Drawing.Size(255, 401);
+            this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.buttonLogs);
             this.Controls.Add(this.groupBox2);
@@ -223,6 +258,8 @@ namespace R34Downloader.Forms
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownFileSizeMB)).EndInit();
             this.ResumeLayout(false);
 
@@ -244,5 +281,8 @@ namespace R34Downloader.Forms
         private System.Windows.Forms.NumericUpDown numericUpDownFileSizeMB;
         private System.Windows.Forms.Label labelFileSizeMB;
         private System.Windows.Forms.CheckBox checkBoxFileSizeLimit;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.Label labelBlacklistedTags;
+        private System.Windows.Forms.TextBox textBoxBlacklistedTags;
     }
 }

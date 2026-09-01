@@ -96,6 +96,7 @@
     <Compile Include="Services\DownloadService.cs" />
     <Compile Include="Services\R34ApiService.cs" />
     <Compile Include="Services\R34HtmlService.cs" />
+    <Compile Include="Services\TagBlacklistService.cs" />
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="Forms\SettingsForm.cs">
       <SubType>Form</SubType>

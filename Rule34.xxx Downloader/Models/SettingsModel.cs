@@ -49,5 +49,10 @@ namespace R34Downloader.Models
         /// Maximum file size in MB (0 = no limit).
         /// </summary>
         public static double MaxFileSizeMB { get; set; }
+
+        /// <summary>
+        /// Space-separated tags that should not be downloaded.
+        /// </summary>
+        public static string BlacklistedTags { get; set; } = "ai_generated";
     }
 }

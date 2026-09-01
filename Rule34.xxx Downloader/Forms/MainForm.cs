@@ -33,6 +33,7 @@ namespace R34Downloader.Forms
             SettingsModel.IsApi = Properties.Settings.Default.IsApi;
             SettingsModel.UserId = Properties.Settings.Default.UserId;
             SettingsModel.ApiKey = Properties.Settings.Default.ApiKey;
+            SettingsModel.BlacklistedTags = Properties.Settings.Default.BlacklistedTags;
             toolStripStatusLabel1.Text = "Welcome!";
             toolStripStatusLabel2.Text = "0 / 0";
 

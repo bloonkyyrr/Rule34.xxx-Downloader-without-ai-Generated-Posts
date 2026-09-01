@@ -36,6 +36,7 @@ namespace R34Downloader.Forms
 
             textBox1.Text = SettingsModel.UserId;
             textBox2.Text = SettingsModel.ApiKey;
+            textBoxBlacklistedTags.Text = SettingsModel.BlacklistedTags ?? string.Empty;
             checkBoxFileSizeLimit.Checked = SettingsModel.EnableFileSizeLimit;
             numericUpDownFileSizeMB.Value = (decimal)SettingsModel.MaxFileSizeMB;
             numericUpDownFileSizeMB.Enabled = SettingsModel.EnableFileSizeLimit;
@@ -61,8 +62,14 @@ namespace R34Downloader.Forms
             Properties.Settings.Default.IsApi = SettingsModel.IsApi;
             Properties.Settings.Default.UserId = SettingsModel.UserId;
             Properties.Settings.Default.ApiKey = SettingsModel.ApiKey;
+            Properties.Settings.Default.BlacklistedTags = SettingsModel.BlacklistedTags ?? string.Empty;
             Properties.Settings.Default.Save();
             Close();
+        }
+
+        private void textBoxBlacklistedTags_TextChanged(object sender, EventArgs e)
+        {
+            SettingsModel.BlacklistedTags = textBoxBlacklistedTags.Text;
         }
 
         private void checkBoxFileSizeLimit_CheckedChanged(object sender, EventArgs e)

@@ -69,5 +69,17 @@ namespace R34Downloader.Properties {
                 this["IsApi"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ai_generated")]
+        public string BlacklistedTags {
+            get {
+                return ((string)(this["BlacklistedTags"]));
+            }
+            set {
+                this["BlacklistedTags"] = value;
+            }
+        }
     }
 }

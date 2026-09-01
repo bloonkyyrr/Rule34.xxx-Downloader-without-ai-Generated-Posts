@@ -127,9 +127,9 @@ namespace R34Downloader.Services
                     var id = doc.DocumentElement?.ChildNodes[i].Attributes?.GetNamedItem("id")?.Value;
                     var filename = id + fileExtension;
 
-                    // Check if post contains blacklisted tags (like ai_generated) and skip if it does
+                    // Skip posts that include any tags listed in Settings.
                     var tagsAttribute = doc.DocumentElement?.ChildNodes[i].Attributes?.GetNamedItem("tags")?.Value;
-                    if (!string.IsNullOrEmpty(tagsAttribute) && ContainsBlacklistedTags(tagsAttribute))
+                    if (!string.IsNullOrEmpty(tagsAttribute) && TagBlacklistService.ContainsBlacklistedTags(tagsAttribute))
                     {
                         var skippedStatus = pid * 100 + i + 1;
                         progress.Report(skippedStatus);
@@ -159,46 +159,6 @@ namespace R34Downloader.Services
                     progress2.Report(reportStatus);
                 }
             }
-        }
-
-        /// <summary>
-        /// Checks if a tags string contains blacklisted tags that should be skipped.
-        /// </summary>
-        /// <param name="tagsString">Space or space-separated tag string from API response.</param>
-        /// <returns>True if tags contain blacklisted tags, false otherwise.</returns>
-        private static bool ContainsBlacklistedTags(string tagsString)
-        {
-            if (string.IsNullOrEmpty(tagsString))
-            {
-                return false;
-            }
-
-            // Blacklisted tags to skip (both underscored and spaced versions)
-            var blacklistedTags = new[] { "ai_generated", "ai generated" };
-
-            // Split tags by space or similar delimiters
-            var tags = tagsString.Split(new[] { ' ', '\t' }, System.StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (var tag in tags)
-            {
-                if (string.IsNullOrEmpty(tag))
-                {
-                    continue;
-                }
-
-                var normalizedTag = tag.ToLowerInvariant().Trim();
-
-                foreach (var blacklistedTag in blacklistedTags)
-                {
-                    if (normalizedTag.Equals(blacklistedTag, System.StringComparison.OrdinalIgnoreCase) || 
-                        normalizedTag.Replace("_", " ").Equals(blacklistedTag, System.StringComparison.OrdinalIgnoreCase))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
         }
 
         private static string GetAuthenticatedUrl(string url)

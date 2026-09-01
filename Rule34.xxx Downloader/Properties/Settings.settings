@@ -14,5 +14,8 @@
     <Setting Name="IsApi" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="BlacklistedTags" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ai_generated</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
