@@ -10,24 +10,31 @@ permissions:
 
 jobs:
   build-and-release:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up .NET SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
 
-      - name: Restore
-        run: dotnet restore
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+
+      - name: Restore HtmlAgilityPack
+        run: |
+          nuget install HtmlAgilityPack -Version 1.12.4 -OutputDirectory packages
+          New-Item -ItemType Directory -Force -Path "Rule34.xxx Downloader\lib" | Out-Null
+          $hap = Get-ChildItem -Path packages -Recurse -Filter HtmlAgilityPack.dll |
+            Where-Object { $_.DirectoryName -match 'net45|net48|Net45' } |
+            Select-Object -First 1
+          if (-not $hap) {
+            $hap = Get-ChildItem -Path packages -Recurse -Filter HtmlAgilityPack.dll | Select-Object -First 1
+          }
+          Copy-Item $hap.FullName "Rule34.xxx Downloader\lib\HtmlAgilityPack.dll" -Force
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
-
-      - name: Publish
-        run: dotnet publish --configuration Release --output ./publish --no-build
+        run: msbuild "Rule34.xxx Downloader.sln" /p:Configuration=Release /p:Platform="Any CPU" /p:OutDir="${{ github.workspace }}\publish\\"
 
       - name: Compress publish directory
         run: tar -czf release-nightly.tar.gz -C ./publish .
