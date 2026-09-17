@@ -36,13 +36,22 @@ jobs:
       - name: Build
         run: msbuild "Rule34.xxx Downloader.sln" /p:Configuration=Release /p:Platform="Any CPU" /p:OutDir="${{ github.workspace }}\publish\\"
 
-      - name: Compress publish directory
-        run: tar -czf release-nightly.tar.gz -C ./publish .
+      - name: Create release ZIP
+        shell: pwsh
+        run: |
+          $archive = Join-Path $env:GITHUB_WORKSPACE "R34Downloader-nightly.zip"
+          Compress-Archive -Path (Join-Path $env:GITHUB_WORKSPACE "publish\*") -DestinationPath $archive -Force
+
+          if (-not (Test-Path -LiteralPath $archive) -or (Get-Item -LiteralPath $archive).Length -eq 0) {
+            throw "Release ZIP was not created or is empty: $archive"
+          }
+
+          Get-Item -LiteralPath $archive | Format-List FullName, Length
 
       - name: Create or update nightly prerelease
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: nightly
           name: Nightly
           prerelease: true
-          files: release-nightly.tar.gz
+          files: R34Downloader-nightly.zip
