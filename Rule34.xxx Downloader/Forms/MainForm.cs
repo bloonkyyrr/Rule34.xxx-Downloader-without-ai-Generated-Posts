@@ -34,8 +34,8 @@ namespace R34Downloader.Forms
             SettingsModel.UserId = Properties.Settings.Default.UserId;
             SettingsModel.ApiKey = Properties.Settings.Default.ApiKey;
             SettingsModel.BlacklistedTags = Properties.Settings.Default.BlacklistedTags;
-            toolStripStatusLabel1.Text = "Welcome!";
-            toolStripStatusLabel2.Text = "0 / 0";
+            SetStatusText("Welcome!");
+            SetProgressText(0, 0);
 
             // Hook up download progress event to show percentage
             DownloadService.OnDownloadProgress = (downloadedMB, totalMB) =>
@@ -43,7 +43,7 @@ namespace R34Downloader.Forms
                 if (totalMB > 0)
                 {
                     double percentage = (downloadedMB / totalMB) * 100;
-                    toolStripStatusLabel1.Text = $"{percentage:F1}%";
+                    SetStatusText($"{percentage:F1}%");
                 }
             };
 
@@ -73,14 +73,14 @@ namespace R34Downloader.Forms
         {
             try
             {
-                toolStripStatusLabel1.Text = "Searching...";
+                SetStatusText("Searching...");
                 var request = textBox1.Text.Replace(' ', '+').Replace("*", "%2a");
                 if (SettingsModel.IsApi)
                 {
                     var countContent = R34ApiService.GetContentCount(request);
                     if (countContent > 0)
                     {
-                        toolStripStatusLabel1.Text = "Search completed";
+                        SetStatusText("Search completed");
                         if (MessageBox.Show(countContent + " results found. Open in a browser?", "Searching results", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                         {
                             Process.Start("https://rule34.xxx/index.php?page=post&s=list&tags=" + request);
@@ -88,7 +88,7 @@ namespace R34Downloader.Forms
                     }
                     else
                     {
-                        toolStripStatusLabel1.Text = "Search completed";
+                        SetStatusText("Search completed");
                         MessageBox.Show("Nobody here but us chickens!", "Not Found", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
@@ -99,7 +99,7 @@ namespace R34Downloader.Forms
                         var countContent = R34HtmlService.GetCountContent(request, R34HtmlService.GetMaxPid(request));
                         if (countContent > 0)
                         {
-                            toolStripStatusLabel1.Text = "Search completed";
+                            SetStatusText("Search completed");
                             if (MessageBox.Show(countContent + " results found. Open in a browser?", "Searching results", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                             {
                                 Process.Start("https://rule34.xxx/index.php?page=post&s=list&tags=" + request);
@@ -107,20 +107,20 @@ namespace R34Downloader.Forms
                         }
                         else
                         {
-                            toolStripStatusLabel1.Text = "Search completed";
+                            SetStatusText("Search completed");
                             MessageBox.Show("Unable to search this deep in temporarily (error on site)", "Search error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
                     else
                     {
-                        toolStripStatusLabel1.Text = "Search completed";
+                        SetStatusText("Search completed");
                         MessageBox.Show("Nobody here but us chickens!", "Not Found", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
             }
             catch (Exception exp)
             {
-                toolStripStatusLabel1.Text = "Search error";
+                SetStatusText("Search error");
                 MessageBox.Show(exp.Message, "Search error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -187,7 +187,7 @@ namespace R34Downloader.Forms
             }
             catch (Exception exp)
             {
-                toolStripStatusLabel1.Text = "Download error";
+                SetStatusText("Download error");
                 MessageBox.Show(exp.Message, "Download error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -198,13 +198,13 @@ namespace R34Downloader.Forms
             {
                 DownloadControlService.Resume();
                 buttonPauseResume.Text = "Pause";
-                toolStripStatusLabel1.Text = "Downloading content...";
+                SetStatusText("Downloading content...");
             }
             else
             {
                 DownloadControlService.Pause();
                 buttonPauseResume.Text = "Resume";
-                toolStripStatusLabel1.Text = "Download paused";
+                SetStatusText("Download paused");
             }
         }
 
@@ -247,11 +247,12 @@ namespace R34Downloader.Forms
             DownloadControlService.BeginDownload();
             SetDownloadControls(isDownloading: true);
 
-            toolStripStatusLabel1.Text = "Downloading content...";
+            SetStatusText("Downloading content...");
             toolStripProgressBar1.Maximum = SettingsModel.Limit;
+            toolStripProgressBar1.Value = 0;
 
-            var progress = new Progress<int>(s => toolStripProgressBar1.Value = s);
-            var progress2 = new Progress<int>(s => toolStripStatusLabel2.Text = s + " / " + SettingsModel.Limit);
+            var progress = new Progress<int>(SetProgressValue);
+            var progress2 = new Progress<int>(s => SetProgressText(s, SettingsModel.Limit));
 
             try
             {
@@ -259,7 +260,7 @@ namespace R34Downloader.Forms
                     () => downloadAction(selectedPath, request, SettingsModel.Limit, progress, progress2),
                     TaskCreationOptions.LongRunning);
 
-                toolStripStatusLabel1.Text = "Download completed";
+                SetStatusText("Download completed");
                 if (MessageBox.Show("Download completed! Open the folder?", "Download completed", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                 {
                     Process.Start(selectedPath);
@@ -278,6 +279,60 @@ namespace R34Downloader.Forms
             button2.Enabled = !isDownloading;
             buttonPauseResume.Enabled = isDownloading;
             buttonPauseResume.Text = "Pause";
+        }
+
+        /// <summary>
+        /// Updates the status-strip message on the UI thread. Downloads run on a worker
+        /// thread, and updating a ToolStrip item from that thread can corrupt its paint state.
+        /// </summary>
+        private void SetStatusText(string text)
+        {
+            InvokeOnUiThread(() => toolStripStatusLabel1.Text = text ?? string.Empty);
+        }
+
+        private void SetProgressText(int current, int total)
+        {
+            InvokeOnUiThread(() => toolStripStatusLabel2.Text = current + " / " + total);
+        }
+
+        private void SetProgressValue(int value)
+        {
+            InvokeOnUiThread(() =>
+            {
+                var clampedValue = Math.Max(toolStripProgressBar1.Minimum, Math.Min(value, toolStripProgressBar1.Maximum));
+                toolStripProgressBar1.Value = clampedValue;
+            });
+        }
+
+        private void InvokeOnUiThread(Action update)
+        {
+            if (IsDisposed || Disposing || !IsHandleCreated)
+            {
+                return;
+            }
+
+            if (InvokeRequired)
+            {
+                try
+                {
+                    BeginInvoke(update);
+                }
+                catch (InvalidOperationException)
+                {
+                    // The form was closed between the checks above and BeginInvoke.
+                }
+
+                return;
+            }
+
+            update();
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            // The callback is static and can otherwise retain this disposed form after close.
+            DownloadService.OnDownloadProgress = null;
+            base.OnFormClosed(e);
         }
 
         private static bool CheckForInternetConnection(string address)
